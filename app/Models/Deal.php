@@ -39,10 +39,17 @@ class Deal extends Model implements HasMedia
         return $this->belongsTo(PipelineStage::class, 'stage_id');
     }
 
-    public function pipeline(): BelongsTo
+    public function pipeline(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
     {
-        return $this->belongsTo(Pipeline::class, 'pipeline_id')
-            ->through('stage'); // via stage → pipeline
+        // Deal → PipelineStage → Pipeline  (read-only, for convenience)
+        return $this->hasOneThrough(
+            Pipeline::class,
+            PipelineStage::class,
+            'id',         // stages.id
+            'id',         // pipelines.id
+            'stage_id',   // deals.stage_id
+            'pipeline_id' // stages.pipeline_id
+        );
     }
 
     public function account(): BelongsTo

@@ -19,6 +19,7 @@ return [
     'central_domains' => [
         '127.0.0.1',
         'localhost',
+        'saas-app.test',
     ],
 
     /**
@@ -127,7 +128,9 @@ return [
          * edge cases, it can cause issues (like using Passport with Vapor - see #196), so
          * you may want to disable this if you are experiencing these edge case issues.
          */
-        'suffix_storage_path' => true,
+        // Disabled — keeping a shared storage path prevents session files from
+        // being lost when tenancy switches the storage root mid-request.
+        'suffix_storage_path' => false,
 
         /**
          * By default, asset() calls are made multi-tenant too. You can use global_asset() and mix()
@@ -136,7 +139,10 @@ return [
          * disable asset() helper tenancy and explicitly use tenant_asset() calls in places
          * where you want to use tenant-specific assets (product images, avatars, etc).
          */
-        'asset_helper_tenancy' => true,
+        // Disabled — Filament uses asset() for its CSS/JS and we don't want
+        // those redirected to /tenancy/assets/. Use tenant_asset() explicitly
+        // for any tenant-specific files (avatars, uploads, etc).
+        'asset_helper_tenancy' => false,
     ],
 
     /**
@@ -194,7 +200,7 @@ return [
      * Parameters used by the tenants:seed command.
      */
     'seeder_parameters' => [
-        '--class' => 'DatabaseSeeder', // root seeder class
+        '--class' => 'TenantDatabaseSeeder',
         // '--force' => true, // This needs to be true to seed tenant databases in production
     ],
 ];
